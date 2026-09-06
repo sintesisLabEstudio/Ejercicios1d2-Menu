@@ -1,2 +1,275 @@
-# Ejercicios1d2-Menu
-Menu de opciones Operativo Suma 1 Numeros,Pesos a dolares ,Cuota en Pesos Imc ...hay mas son 10 modulos
+    Requerimientos
+        Para acceder a los siguientes ejercicios, genere un menu donde
+        pueda acceder a cada uno de ellos, capturando la opcion del
+        usuario mediante segun/switch o condicionales si/sino, e
+        invocando a cada subprograma segun la seleccion:
+            1 suma2Numeros
+            2 pesosAdolares
+            3 cuotaEnPesos
+            4 IMC
+            5 sueldoAnual
+            6 centimetrosApies
+            7 ciclo10
+            8 sueldoNeto
+
+    Desarrollo
+        PRG
+            menu
+        DIC
+            RUTAS
+                1 suma2Numeros
+                2 pesosAdolares 
+                3 cuotaEnPesos
+                4 IMC
+                5 sueldoAnual
+                6 centimetrosApies
+                7 ciclo10
+                8 sueldoNeto
+
+    Validacion
+        No aplica, el menu solo enruta hacia los demas programas,
+        no calcula un resultado propio
+EJERCICIO 1 - suma2Numeros ƒ
+
+    Requerimiento
+        Genere un programa que sume 2 numeros y muestre el resultado
+
+    Desarrollo
+        PRG
+            suma2Numeros
+        INP
+            num1 int
+            num2 int
+        PRO
+            tot = num1 + num2
+        OUT
+            tot
+
+    Validacion
+        num1    num2    tot
+        1       1       2
+        5       7       12
+EJERCICIO 2 - pesosAdolares ƒ
+
+    Requerimiento
+        Genere un programa que transforme pesos (CLP) a dolares (USD),
+        imprimiendo el resultado en pantalla. La cantidad de pesos
+        (CLP) es ingresada por el usuario
+
+    Desarrollo
+        PRG
+            pesosAdolares
+        DIC
+            CTE
+                valorDolar
+        INP
+            cantPesos double
+        PRO
+            totalDolares = cantPesos / valorDolar
+        OUT
+            totalDolares
+
+    Validacion
+        valorDolar    cantPesos    totalDolares    fecha
+        1000          1000         1               -
+        1000          2000         2               -
+        931           931          1               hoy
+EJERCICIO 3 - cuotaEnPesos //revisar
+
+    Requerimiento
+        Genere un programa que calcule e imprima el valor de una cuota
+        en pesos (CLP) de un credito hipotecario expresado en UF. El
+        valor de la UF es el valor del dia. El valor del credito debe
+        ser ingresado por el usuario
+
+    Desarrollo
+        PRG
+            cuotaEnPesos
+        INP
+            valorUfDia double         // en pesos, ejem 40000
+            costoCreditoHipUf double  // en UF, ejem 5000
+        PRO
+            cuotaEnPesos = valorUfDia * costoCreditoHipUf
+        OUT
+            cuotaEnPesos
+
+    Validacion
+        valorUfDia       costoCreditoHipUf    cuotaEnPesos
+        $40.880,36       5.000 UF             $204.401.800
+EJERCICIO 4 - IMC ƒ
+
+    Requerimiento
+        Genere un programa que calcule el IMC (Indice de Masa
+        Corporal) = Masa / (estatura)^2. Masa y estatura son
+        ingresados por el usuario
+
+    Desarrollo
+        PRG
+            IMC
+        INP
+            peso double
+            estatura double
+        PRO
+            imc = peso / (estatura)^2
+        OUT
+            imc
+
+    Validacion
+        peso    estatura    imc
+        70      1,75        22,86
+EJERCICIO 5 - SueldoAnual ƒ
+
+    Requerimiento
+        Genere un programa que calcule el total del sueldo ganado en
+        un ano, donde el valor del sueldo mensual es constante durante
+        el ano. El sueldo mensual es ingresado por el usuario
+
+    Desarrollo
+        PRG
+            sueldoAnual
+        DIC
+            CTE
+                meses = 12
+        INP
+            sueldoMensual double
+        PRO
+            total = sueldoMensual * meses
+        OUT
+            total
+
+    Validacion
+        meses    sueldoMensual    total
+        12       $500.000         $6.000.000
+EJERCICIO 6 - CentimetrosApies ƒ
+
+    Requerimiento
+        Genere un programa para convertir una longitud dada en
+        centimetros a pies. Los centimetros son ingresados por el
+        usuario. Considere que: 1 pie = 30.48 centimetros
+
+    Desarrollo
+        PRG
+            centimetrosApies
+        DIC
+            CTE
+                pie = 30.48   // centimetros
+        INP
+            centimetros double
+        PRO
+            totalPies = centimetros / pie
+        OUT
+            totalPies
+
+    Validacion
+        pie        centimetros    totalPies
+        30,48      30,48          1
+        30,48      100            3,28
+EJERCICIO 7 - Ciclo10 ƒ
+
+    Requerimiento
+        Genere un programa que posea tres opciones para generar un
+        ciclo de 0 a 10, donde la primera opcion genera un ciclo
+        while, la segunda un ciclo for y la tercera un ciclo do while,
+        identificados con los valores 1, 2 y 3 respectivamente. El
+        valor es ingresado por el usuario y en caso de no pertenecer
+        al grupo solo enviara un mensaje que diga fuera de rango
+
+    Desarrollo
+        PRG
+            ciclo10
+        DIC
+            CTE
+                GLO
+                    defCiclo = 10
+        INP
+            OPC
+                1 cicloWhile(defCiclo)
+                2 cicloFor(defCiclo)
+                3 cicloDoWhile(defCiclo)
+            VAR
+                ciclo = 1,2,3
+                (si err => fuera de rango)
+        PRO
+            ejecutar ciclo elejido despliega
+                cicloWhile(defCiclo)
+                cicloFor(defCiclo)
+                cicloDoWhile(defCiclo)
+        OUT
+            numCic   // numeros del ciclo en pantalla
+        FNC
+            cicloWhile(defCiclo)
+                despliega este tipo de ciclo
+            cicloFor(defCiclo)
+                despliega este tipo de ciclo
+            cicloDoWhile(defCiclo)
+                despliega este tipo de ciclo
+
+    Validacion
+        defCiclo    cicloWhile    cicloFor    cicloDoWhile
+        10          11            11          11
+EJERCICIO 8 - faltasPermitidas ƒ
+
+    Requerimiento
+        Existe un alumno que utiliza periodicamente la "ley del menor
+        esfuerzo", por lo cual necesita saber la cantidad de veces que
+        se le permite faltar a la asignatura de "Taller de Nuevas
+        Tecnologias". El sabe que el modulo se compone de 12 clases y
+        que la asistencia minima es de un 70%. Genere un programa que
+        calcule cuantas clases puede faltar este alumno sin perder la
+        asignatura por inasistencia
+
+    Desarrollo
+        PRG
+            faltasPermitidas
+        DIC
+            CTE
+                clases = 12       // sin perder asignatura
+                asisteMin = 70%
+        PRO
+            faltasExactas = clases * (1 - asisteMin)
+            maxFal = piso(faltasExactas)
+        OUT
+            "El maximo de faltas permitidas es: ", maxFal
+
+    Validacion
+        clases    asisteMin    maxFal
+        12        70%          3
+
+        Calculo: faltasExactas = 12 * (1 - 0.70) = 3,6
+                 piso(3,6) = 3
+EJERCICIO 9 - sueldoNeto ƒ
+
+    Requerimiento
+        El sueldo neto de un vendedor se calcula como la suma de un
+        sueldo basico mas el 12% del monto de cada venta. Diseñe un
+        programa que determine el sueldo neto de un vendedor sabiendo
+        que hizo tres ventas en el mes. Las tres ventas son ingresadas
+        por el usuario y el sueldo base es de $300.000
+
+    Desarrollo
+        PRG
+            sueldoNeto
+        DIC
+            CTE
+                bonoPorventa = 12%
+                sueldoBase = 300000
+                CantVentas = 3
+        INP
+            MontoVenta1 double
+            MontoVenta2 double
+            MontoVenta3 double
+        PRO
+            montoTotalVentas = MontoVenta1 + MontoVenta2 + MontoVenta3
+            sueldoNeto = sueldoBase + (montoTotalVentas * bonoPorventa)
+        OUT
+            sueldoNeto
+
+    Validacion
+        bonoPorventa    sueldoBase    CantVentas    totMontoVentas    totBono    sueldoNeto
+        12%             $300.000      3             $305.000          $36.600    $336.600
+
+        detalle
+        numVenta    montoVenta
+        1           $100.000
+        2           $200.000
+        3           $5.000
