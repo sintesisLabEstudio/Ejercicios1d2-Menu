@@ -1,0 +1,917 @@
+funcionalidades:
+    El sistema es una aplicacion de escritorio movil que integra multiples
+    herramientas de calculo y aprendizaje. 
+    Incluye un Menu Principal (MainActivity) que permite navegar entre 
+    las siguientes funciones: 
+        1. Suma de dos numeros con visualizacion de operandos y resultado.
+        2. Conversion de moneda de Pesos Chilenos a Dolares (CLP a USD) con validacion de valor del dolar. 
+        3. Calculo de cuotas en pesos a partir de valores en UF con normalizacion inteligente de separadores de miles y decimales. 
+        4. Calculo del Indice de Masa Corporal (IMC) con diagnostico basado en rangos de la OMS. 
+        5. Calculo de Sueldo Anual a partir del sueldo mensual. 
+        6. Conversion de unidades de longitud de Centimetros a Pies. 
+        7. Demostracion de estructuras de control repetitivas (Ciclos While, Do-While y For) contando repeticiones. 
+        8. Calculo de faltas permitidas para mantener un 70% de asistencia en un curso de 12 clases. 
+        9. Calculo de Sueldo Neto que incluye un sueldo base de $300.000 y un bono del 12% por ventas, 
+            permitiendo el ingreso de 3 ventas estaticas o la generacion dinamica de N campos de entrada 
+            en una pantalla secundaria (DetalleVentas). 
+            El codigo incluye validaciones de entrada, manejo de excepciones de conversion, 
+            formateo de decimales y uso de Intents para navegacion entre actividades, 
+            manteniendo comentarios explicativos y didacticos para cada bloque logico.
+nombre del archivo:AndroidManifest.xml
+        Descripcion:
+            Archivo de configuracion principal del sistema Android. Define el paquete de la aplicacion, los permisos, el tema visual y declara todas las actividades (pantallas) del sistema, especificando cual es la actividad de inicio (MainActivity).
+        Enlace a otros archvos:
+            Enlaza con todas las clases Activity del paquete com.example.ejercicio1app 
+            y los recursos de estilos y strings.
+        codigo completo:
+            <?xml version="1.0" encoding="utf-8"?>
+            <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools">
+                <application
+                    android:allowBackup="true"
+                    android:dataExtractionRules="@xml/data_extraction_rules"
+                    android:fullBackupContent="@xml/backup_rules"
+                    android:icon="@mipmap/ic_launcher"
+                    android:label="@string/app_name"
+                    android:roundIcon="@mipmap/ic_launcher_round"
+                    android:supportsRtl="true"
+                    android:theme="@style/Theme.Ejercicio1APP">
+                    <!-- Pantalla Principal: Es el punto de entrada de la app (LAUNCHER) -->
+                    <activity
+                        android:name=".MainActivity"
+                        android:exported="true"
+                        android:windowSoftInputMode="adjustResize">
+                        <intent-filter>
+                            <action android:name="android.intent.action.MAIN" />
+                            <category android:name="android.intent.category.LAUNCHER" />
+                        </intent-filter>
+                    </activity>
+                    <!-- Registro de Actividades Secundarias: Cada una debe estar declarada aqui para poder ser lanzada mediante Intents -->
+                    <activity android:name=".Suma2Numeros" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".PesosAdolares" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".CuotaEnPesos" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".Imc" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".SueldoAnual" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".CentimetrosApies" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".Ciclo10" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".SueldoNeto" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".FaltasPermitadas" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                    <activity android:name=".DetalleVentas" android:exported="false" android:windowSoftInputMode="adjustResize" />
+                </application>
+            </manifest>
+nombre del archivo:MainActivity.kt
+    Descripcion:Clase controladora de la pantalla principal. Actua como un menu selector que redirige al usuario a las distintas funcionalidades del sistema segun la opcion numerica ingresada.
+    Enlace a otros archvos:Activity_main.xml (layout), Suma2Numeros.kt, PesosAdolares.kt, CuotaEnPesos.kt, Imc.kt, SueldoAnual.kt, CentimetrosApies.kt, Ciclo10.kt, FaltasPermitadas.kt, SueldoNeto.kt.
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.content.Intent
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.Toast
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class MainActivity : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            // Habilita el diseño de borde a borde para aprovechar toda la pantalla
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_main)
+            // Ajusta el padding para evitar que el contenido quede oculto bajo las barras del sistema
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            // Referencia al boton "Ir" del menu
+            val btnIr = findViewById<Button>(R.id.btnIr)
+            // Configuracion del evento clic para procesar la opcion seleccionada
+            btnIr.setOnClickListener {
+                val inputOpc = findViewById<EditText>(R.id.txtNumOpcion).text.toString()
+                if (inputOpc.isNotEmpty()) {
+                    menu(inputOpc) // Llama a la funcion de enrutamiento
+                } else {
+                    Toast.makeText(this, "Por favor ingrese una opción", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        // Funcion que gestiona la navegacion mediante una estructura 'when' (similar a switch)
+        fun menu(opcion: String) {
+            val numOpc = opcion.toIntOrNull()
+            if (numOpc != null && numOpc in 0..9) {
+                when (numOpc) {
+                    0 -> finishAffinity() // Cierra todas las actividades y sale de la app
+                    1 -> {
+                        limpiarOpcion()
+                        val intent = Intent(this, Suma2Numeros::class.java)
+                        startActivity(intent)
+                    }
+                    2 -> {
+                        limpiarOpcion()
+                        val intent  = Intent(this, PesosAdolares::class.java)
+                        startActivity(intent)
+                    }
+                    3 -> {
+                        limpiarOpcion()
+                        val intent  = Intent(this,CuotaEnPesos::class.java)
+                        startActivity(intent)
+                    }
+                    4 -> {
+                        limpiarOpcion()
+                        val intent  = Intent(this,Imc::class.java)
+                        startActivity(intent)
+                    }
+                    5 -> {
+                        limpiarOpcion()
+                        val intent  = Intent(this, SueldoAnual::class.java)
+                        startActivity(intent)
+                    }
+                    6-> {
+                        limpiarOpcion()
+                        val intent  = Intent(this, CentimetrosApies::class.java)
+                        startActivity(intent)
+                    }
+                    7-> {
+                        limpiarOpcion()
+                        val intent  = Intent(this, Ciclo10::class.java)
+                        startActivity(intent)
+                    }
+                    8-> {
+                        limpiarOpcion()
+                        val intent  = Intent(this, FaltasPermitadas::class.java)
+                        startActivity(intent)
+                    }
+                    9-> {
+                        limpiarOpcion()
+                        val intent  = Intent(this, SueldoNeto::class.java)
+                        startActivity(intent)
+                    }
+                    else -> {
+                        Toast.makeText(this, "Opción $numOpc seleccionada (en desarrollo)", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                val mensaje = "Debe ingresar un numero entre 0 y 9"
+                Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+            }
+        }
+        // Funcion auxiliar para borrar el texto de entrada despues de navegar
+        private fun limpiarOpcion() {
+            findViewById<EditText>(R.id.txtNumOpcion).text.clear()
+        }
+    }
+    -------------------------
+    |         MENU          |
+    |                       |
+    |   1 suma2Numeros      |
+    |   2 pesosAdolares     |
+    |   3 cuotaEnPesos      |
+    |   4 IMC               |
+    |   5 sueldoAnual       |
+    |   6 centimetrosApies  |
+    |   7 ciclo10           |
+    |   8 Faltas Permitidas |
+    |   9 Sueldo Neto       |
+    |   0 Salir             |
+    |                       |
+    |   Ingrese la Opción   |
+    |  [txtNumOpcion      ] |
+    |                       |
+    |      [   Ir   ]       |
+    -------------------------
+nombre del archivo:Suma2Numeros.kt
+    Descripcion:Actividad que permite al usuario sumar dos numeros. Captura las entradas, realiza la operacion aritmetica y muestra el resultado tanto en un Toast como en TextViews en pantalla.
+    Enlace a otros archvos:activity_suma2_numeros.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.TextView
+    import android.widget.Toast
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class Suma2Numeros : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_suma2_numeros)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            // Referenciamos los botones de accion
+            val btnSuma= findViewById<Button>(R.id.btnSuma)
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            // Logica del boton Sumar
+            btnSuma.setOnClickListener {
+                // Captura de los campos de entrada
+                val txtNum1 = findViewById<EditText>(R.id.txtInputN1)
+                val txtNum2 = findViewById<EditText>(R.id.txtInputN2)
+                // Conversion segura a Double (si es nulo o invalido, usa 0.0)
+                val num1 = txtNum1.text.toString().toDoubleOrNull() ?: 0.0
+                val num2 = txtNum2.text.toString().toDoubleOrNull() ?: 0.0
+                // Realizacion del calculo
+                val tot= num1+num2
+                val resultado= tot.toString()
+                val respuesta="La suma de ${num1.toString()} + ${num2.toString()} = "+ resultado
+                // Muestra el resultado en una notificacion flotante
+                Toast.makeText(this,respuesta, Toast.LENGTH_LONG).show()
+                // Referencia a los elementos de salida visual en el layout
+                val txvNum1 = findViewById<TextView>(R.id.txvNum1)
+                val txvNum2 = findViewById<TextView>(R.id.txvNum2)
+                val txvTotal= findViewById<TextView>(R.id.txvResultado)
+                // Actualizacion de los textos en pantalla
+                txvNum1.text= num1.toString()
+                txvNum2.text= num2.toString()
+                txvTotal.text=resultado
+                // Limpieza de campos para una nueva operacion
+                txtNum1.text.clear()
+                txtNum2.text.clear()
+                txtNum1.requestFocus() // Deja el cursor listo en el primer campo
+        }
+            // Boton para cerrar esta actividad y volver al menu principal
+            btnMenu.setOnClickListener {
+                finish()
+            }
+        }
+    }
+    -------------------------
+    |        [Volver a Menu]|
+    |                       |
+    |    SUMA 2 NUMEROS     |
+    |                       |
+    |  ingrese el Numero 1  |
+    |  [txtInputN1        ] |
+    |                       |
+    |  ingrese el Numero 2  |
+    |  [txtInputN2        ] |
+    |                       |
+    |      [ Sumar ]        |
+    |                       |
+    | [txvNum1] + [txvNum2] |
+    |      = [txvResultado] |
+nombre del archivo:PesosAdolares.kt
+    Descripcion:Herramienta para convertir Pesos Chilenos (CLP) a Dolares (USD). Requiere ingresar el tipo de cambio actual y el monto a convertir.
+    Enlace a otros archvos:activity_pesos_adolares.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.TextView
+    import android.widget.Toast
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class PesosAdolares : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_pesos_adolares)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val btnCalculo= findViewById<Button>(R.id.btnCalc)
+            btnCalculo.setOnClickListener {
+                // Referencias a inputs y outputs
+                val txtValorDolar= findViewById<EditText>(R.id.txtValorDolar)
+                val txtPesos= findViewById<EditText>(R.id.txtPesos)
+                val txvValorDolar= findViewById<TextView>(R.id.txvValDolar)
+                val txvPesos = findViewById<TextView>(R.id.txvPesos)
+                val txvDolares = findViewById<TextView>(R.id.txvDolares)
+                // Captura de valores ingresados
+                val valorDolar=txtValorDolar.text.toString().toDoubleOrNull() ?: 0.0
+                var pesos = txtPesos.text.toString().toDoubleOrNull() ?: 0.0
+                // Validacion: No se puede calcular sin un monto en pesos
+                if(pesos==0.0){
+                    Toast.makeText(this,"Ingrese pesos", Toast.LENGTH_LONG).show()
+                    txtPesos.requestFocus()
+                } else {
+                    var totalDolares=0.0
+                    // Validacion matematica: Evitar division por cero
+                    if (valorDolar > 0.0) {
+                        totalDolares= pesos/valorDolar
+                    } else {
+                        Toast.makeText(this,"el valor del dolar no puede ser 0", Toast.LENGTH_LONG).show()
+                        txtValorDolar.requestFocus()
+                    }
+                    // Si ambos valores son validos, se muestra el resultado formateado
+                    if (totalDolares>0.0 && pesos >0.0){
+                        txvValorDolar.text=valorDolar.toString()
+                        txvPesos.text=pesos.toString()
+                        // Formateamos a 2 decimales para una presentacion profesional
+                        txvDolares.text= String.format("%.2f", totalDolares)
+                        val mensaje= "Con el valor del dolar a ${valorDolar.toString()} y con ${pesos.toString()} Pesos Tiene ${totalDolares.toString()} dolares"
+                        Toast.makeText(this,mensaje, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            btnMenu.setOnClickListener { finish() }
+        }
+    }
+    -------------------------
+    |       [Volver al Menu]|
+    |                       |
+    |    Pesos a Dolares    |
+    |                       |
+    | Valor Dolar Actual clp|
+    | [txtValorDolar      ] |
+    |                       |
+    |Monto en Pesos Chilenos|
+    | [txtPesos           ] |
+    |                       |
+    |      [ Calcula ]      |
+    |                       |
+    | Valor Dolar: [txvValDolar]|
+    | Pesos:       [txvPesos]   |
+    | Dolares:     [txvDolares] |
+    -------------------------
+nombre del archivo:cuotaEnPesos.kt
+    Descripcion:Calculadora de cuotas de credito que convierte montos expresados en UF a Pesos Chilenos. Destaca por su algoritmo de normalizacion de entradas numericas que acepta diversos formatos de separadores.
+    Enlace a otros archvos:activity_cuota_en_pesos.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.TextView
+    import android.widget.Toast
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    import java.text.DecimalFormat
+    import java.text.DecimalFormatSymbols
+    import java.util.Locale
+    class CuotaEnPesos : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_cuota_en_pesos)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val btnCalculo = findViewById<Button>(R.id.btnCalculoCuota)
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            val txtInputValUf = findViewById<EditText>(R.id.txtInputValorUf)
+            val txtInputCosto = findViewById<EditText>(R.id.txtInputCostoCred)
+            val txvOutCuota = findViewById<TextView>(R.id.txvCuota)
+            btnCalculo.setOnClickListener {
+                val strUf = txtInputValUf.text.toString().trim()
+                val strCosto = txtInputCosto.text.toString().trim()
+                // Llama a la funcion de normalizacion para limpiar los caracteres no numericos (puntos y comas)
+                val valUf = normalizarMonto(strUf)
+                val costoUf = normalizarMonto(strCosto)
+                if (valUf <= 0.0 || costoUf <= 0.0) {
+                    Toast.makeText(this, "Por favor, ingrese valores válidos", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                val resultado = valUf * costoUf
+                // Formateo de Salida: Usa formato de moneda con puntos para miles (Estilo Chile)
+                val symbols = DecimalFormatSymbols(Locale.GERMAN)
+                val formatter = DecimalFormat("$ #,###", symbols)
+                val cuotaFormateada = formatter.format(Math.round(resultado))
+                txvOutCuota.text = cuotaFormateada
+                Toast.makeText(this, "Calc: $valUf * $costoUf", Toast.LENGTH_SHORT).show()
+                txtInputCosto.text.clear()
+                txtInputValUf.text.clear()
+                txtInputValUf.requestFocus()
+            }
+            btnMenu.setOnClickListener { finish() }
+        }
+        // Funcion didactica: Maneja la inconsistencia de los usuarios al ingresar decimales o miles
+        private fun normalizarMonto(monto: String): Double {
+            if (monto.isEmpty()) return 0.0
+            return try {
+                var temp = monto.trim()
+                // Si el texto tiene ambos (punto y coma), asume formato europeo/chileno
+                if (temp.contains(".") && temp.contains(",")) {
+                    temp = temp.replace(".", "").replace(",", ".")
+                }
+                else if (temp.contains(",")) {
+                    temp = temp.replace(",", ".")
+                }
+                else if (temp.contains(".")) {
+                    val partes = temp.split(".")
+                    // Si despues del punto hay 3 cifras, probablemente sea separador de miles
+                    if (partes.size > 1 && partes.last().length == 3) {
+                        temp = temp.replace(".", "")
+                    }
+                }
+                temp.toDoubleOrNull() ?: 0.0
+            } catch (e: Exception) { 0.0 }
+        }
+    }
+    -------------------------
+    |               [Menu]  |
+    |                       |
+    |    cuota En Pesos     |
+    |                       |
+    |     valor Uf actual   |
+    |  [txtInputValorUf   ] |
+    |                       |
+    |   Costo Crédito (UF)  |
+    |  [txtInputCostoCred ] |
+    |                       |
+    |   [ Calculo Cuota ]   |
+    |                       |
+    |  Valor Cuota: [txvCuota]|
+    -------------------------
+nombre del archivo:Imc.kt
+    Descripcion:Calculadora de Indice de Masa Corporal (IMC). Recibe estatura y peso, calcula el indice y entrega un diagnostico segun la Clasificacion de la Organizacion Mundial de la Salud.
+    Enlace a otros archvos:activity_imc.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.widget.Toast
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.TextView
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class Imc : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_imc)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            val btnCalculo = findViewById<Button>(R.id.btnCalcularIMC)
+            val txvOutImc = findViewById<TextView>(R.id.txvImc)
+            val txtInputEstatura = findViewById<EditText>(R.id.txtInputEstatura)
+            val txtInputPeso = findViewById<EditText>(R.id.txtInputPeso)
+            btnCalculo.setOnClickListener {
+                // Reemplazamos la coma por punto para asegurar compatibilidad con Double.toDouble()
+                val strEstatura = txtInputEstatura.text.toString().trim().replace(",", ".")
+                val strPeso = txtInputPeso.text.toString().trim().replace(",", ".")
+                val estatura = strEstatura.toDoubleOrNull() ?: 0.0
+                val peso = strPeso.toDoubleOrNull() ?: 0.0
+                // Validaciones de rango logico
+                if (estatura <= 0.0 || estatura > 2.5) {
+                    Toast.makeText(this, "Ingrese una estatura válida (ej: 1.75)", Toast.LENGTH_SHORT).show()
+                    txtInputEstatura.requestFocus()
+                    return@setOnClickListener
+                }
+                if (peso <= 0.0) {
+                    Toast.makeText(this, "Ingrese un peso válido", Toast.LENGTH_SHORT).show()
+                    txtInputPeso.requestFocus()
+                    return@setOnClickListener
+                }
+                // Formula IMC = peso / estatura al cuadrado
+                val imc = peso / (estatura * estatura)
+                // Estructura condicional para determinar el estado nutricional
+                val diagnostico = when {
+                    imc < 18.5 -> "Bajo peso"
+                    imc < 25.0 -> "Peso normal"
+                    imc < 30.0 -> "Sobrepeso"
+                    else -> "Obesidad"
+                }
+                val mensaje = String.format("Tu IMC es: %.2f (%s)", imc, diagnostico)
+                txvOutImc.text = mensaje
+                Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+                txtInputEstatura.text.clear()
+                txtInputPeso.text.clear()
+                txtInputPeso.requestFocus()
+            }
+            btnMenu.setOnClickListener { finish() }
+        }
+    }
+    -------------------------
+    |               [Menu]  |
+    |                       |
+    |      Calculo IMC      |
+    |                       |
+    |  [txtInputPeso      ] |
+    |                       |
+    |  [txtInputEstatura  ] |
+    |                       |
+    |    [ Calculo IMC ]    |
+    |                       |
+    |      [txvImc]         |
+    -------------------------
+nombre del archivo:SueldoAnual.kt
+    Descripcion:Aplicacion sencilla que multiplica el sueldo mensual por 12 para proyectar los ingresos de un año completo.
+    Enlace a otros archvos:activity_sueldo_anual.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.TextView
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class SueldoAnual : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_sueldo_anual)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val btnMenu= findViewById<Button>(R.id.btnMenu)
+            val txtInputMensual= findViewById<EditText>(R.id.txtInSueldoMes)
+            val txvOutAnual=findViewById<TextView>(R.id.txvOutSueldoAnual)
+            val btnCalc = findViewById<Button>(R.id.btnCalculoAnual)
+            btnCalc.setOnClickListener {
+                val sueldoMes = txtInputMensual.text.toString().toIntOrNull() ?: 0
+                if(sueldoMes>0){
+                    val total = sueldoMes * 12
+                    txvOutAnual.text=total.toString()
+                }
+            }
+            btnMenu.setOnClickListener { finish() }
+        }
+    }
+    -------------------------
+    | Sueldo Anual    [Menu]|
+    |                       |
+    |   Sueldo Mensual      |
+    | [txtInSueldoMes     ] |
+    |                       |
+    |    [txvOutSueldoAnual]|
+    |                       |
+    | [Calculo sueldo Anual]|
+    -------------------------
+nombre del archivo:CentimetrosApies.kt
+    Descripcion:Conversor de longitud. Transforma una medida en centimetros a pies utilizando el factor de conversion de 30.48 cm por pie.
+    Enlace a otros archvos:activity_centimetros_apies.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.Toast
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    import android.widget.TextView
+    class CentimetrosApies : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_centimetros_apies)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            val btnCalcPies = findViewById<Button>(R.id.btnCalcPies)
+            val inputCentimetros = findViewById<EditText>(R.id.txtInputCm)
+            val outPies = findViewById<TextView>(R.id.txvCmApies)
+            btnCalcPies.setOnClickListener {
+                val inputCm = inputCentimetros.text.toString().toDoubleOrNull() ?: 0.0
+                if (inputCm > 0) {
+                    // Formula: cm / 30.48 = pies (ft)
+                    val totalPies = inputCm / 30.48
+                    outPies.text = String.format("%.2f ft", totalPies)
+                } else {
+                    Toast.makeText(this, "Debe ser mayor a cero", Toast.LENGTH_SHORT).show()
+                }
+            }
+            btnMenu.setOnClickListener { finish() }
+        }
+    }
+    -------------------------
+    |                 [Menu]|
+    |                       |
+    |   Centimetros a Pies  |
+    |                       |
+    |  [txtInputCm        ] |
+    |                       |
+    |    [btmCalculoPies ]   |
+    |                       |
+    |     [txvCmApies]      |
+    -------------------------
+nombre del archivo:Ciclo10.kt
+    Descripcion:Modulo didactico para demostrar el uso de bucles en Kotlin. Ejecuta procesos iterativos (While, Do-While y For) y reporta la cantidad de ciclos realizados.
+    Enlace a otros archvos:activity_ciclo10.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.widget.Button
+    import android.os.Bundle
+    import android.widget.TextView
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class Ciclo10 : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_ciclo10)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val btnMenu=findViewById<Button>(R.id.btnMenu)
+            val btnWhile10= findViewById<Button>(R.id.btnWhile10)
+            val btnDoWhile10= findViewById<Button>(R.id.btnDoWhile10)
+            val btnFor10= findViewById<Button>(R.id.btnFor10)
+            val txvWhile= findViewById<TextView>(R.id.txvResultadoWile)
+            val txvDoWhile= findViewById<TextView>(R.id.txvResultadoDoWhile)
+            val txvFor10= findViewById<TextView>(R.id.txvResultadoFor10)
+            btnMenu.setOnClickListener { finish() }
+            // Ejecuta y muestra el resultado del bucle 'while'
+            btnWhile10.setOnClickListener {
+                val resultado=cicloWhile10()
+                txvWhile.text=resultado.toString()
+            }
+            // Ejecuta y muestra el resultado del bucle 'do-while'
+            btnDoWhile10.setOnClickListener {
+                val resultado=cicloDoWhile10()
+                txvDoWhile.text=resultado.toString()
+            }
+            // Ejecuta y muestra el resultado del bucle 'for'
+            btnFor10.setOnClickListener{
+                val resultado=cicloFor10()
+                txvFor10.text=resultado.toString()
+            }
+        }
+        // Funcion que usa While: Se comprueba la condicion ANTES de entrar
+        fun cicloWhile10():Int{
+            var contador = 0
+            var repeticiones=0
+            while(contador<=10){
+                repeticiones++
+                contador++
+            }
+            return repeticiones
+        }
+        // Funcion que usa Do-While: El bloque se ejecuta AL MENOS UNA VEZ antes de comprobar
+        fun cicloDoWhile10():Int{
+            var contador=0
+            var repeticiones=0
+            do {
+                repeticiones++
+                contador++
+        } while(contador<=10)
+        return repeticiones
+        }
+        // Funcion que usa For: Itera sobre un rango definido (de 0 a 10 inclusive)
+        fun cicloFor10():Int{
+            var repeticiones=0
+            for (i in 0..10) {
+                repeticiones++
+            }
+            return repeticiones
+        }
+    }
+    -------------------------
+    |        Ciclo 10 [Menu]|
+    |                       |
+    | [While] [txvResultadoWile] |
+    |                       |
+    | [DoWhile]             |
+    |        [txvResDoWhile]|
+    |                       |
+    | [For 10][txvResFor]   |
+    -------------------------
+nombre del archivo:FaltasPermitadas.kt
+    Descripcion:Calcula cuantas inasistencias se permite un alumno para no perder la asignatura, manteniendo al menos un 70% de asistencia sobre 12 clases totales.
+    Enlace a otros archvos:activity_faltas_permitadas.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.TextView
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    import kotlin.math.ceil
+    class FaltasPermitadas : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_faltas_permitadas)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            // Definicion de constantes del negocio escolar
+            val clases = 12       // Total de clases del modulo
+            val asisteMin = 0.70  // Porcentaje de asistencia obligatorio
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            val txvMensaje = findViewById<TextView>(R.id.txvMensaje)
+            val btnCalFaltas = findViewById<Button>(R.id.btnCalcFaltas)
+            val txvFaltasP = findViewById<TextView>(R.id.txvFaltasP)
+            // Presenta el problema didactico en pantalla usando Strings multilinea
+            val mensaje = """
+                Existe un alumno que utiliza periódicamente la ley del
+                menor esfuerzo, por lo cual necesita saber
+                la cantidad de veces que se le permite faltar
+                a la asignatura de Taller de Nuevas Tecnologías.
+                El módulo se compone de 12 clases
+                y la asistencia mínima es del 70%.
+            """.trimIndent()
+            txvMensaje.text = mensaje
+            btnMenu.setOnClickListener { finish() }
+            btnCalFaltas.setOnClickListener {
+                // Logica: Se calcula el techo (ceil) de las clases obligatorias
+                // Ejemplo: 12 * 0.7 = 8.4, debe asistir a 9 clases minimo
+                val clasesMinimasAsistir = ceil(clases * asisteMin).toInt()
+                val faltasPermitidas = clases - clasesMinimasAsistir
+                // Calculo del porcentaje final para mostrar al usuario
+                val porcentajeConFaltas = ((clases - faltasPermitidas).toDouble() / clases) * 100
+                txvFaltasP.text = "Puede faltar máximo $faltasPermitidas clases.\n(Asistencia resultante: ${porcentajeConFaltas.toInt()}%)"
+            }
+        }
+    }
+    -------------------------
+    |                 [Menu]|
+    |                       |
+    | [txvMensaje         ] |
+    |                       |
+    | [Calcula Faltas perm] |
+    |                       |
+    |   [txvFaltasP]        |
+    -------------------------
+nombre del archivo:SueldoNeto.kt
+    Descripcion:Punto de entrada para el calculo de sueldo neto. Ofrece una opcion rapida para 3 ventas y otra para especificar N cantidad de ventas, delegando el detalle a otra pantalla.
+    Enlace a otros archvos:activity_sueldo_neto.xml (layout), DetalleVentas.kt.
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.content.Intent
+    import android.os.Bundle
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.TextView
+    import android.widget.Toast
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class SueldoNeto : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_sueldo_neto)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val bonoPorventa = 0.12
+            val sueldoBase = 300000
+            val btnMenu = findViewById<Button>(R.id.btnMenu)
+            val btnCalculo = findViewById<Button>(R.id.btnCalcNeto)
+            val txtCantVentas = findViewById<EditText>(R.id.txtCantVentas)
+            btnMenu.setOnClickListener { finish() }
+            // Caso Dinamico: Redirige a DetalleVentas enviando el numero de campos a generar
+            btnCalculo.setOnClickListener {
+                val cantVentas = txtCantVentas.text.toString().toIntOrNull()
+                if (cantVentas != null && cantVentas > 0) {
+                    val intent = Intent(this, DetalleVentas::class.java)
+                    intent.putExtra("CANTIDAD_VENTAS", cantVentas) // Paso de datos entre pantallas
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "Ingrese una cantidad válida mayor a 0", Toast.LENGTH_SHORT).show()
+                }
+            }
+            // Caso Estatico: Calcula el neto usando 3 inputs fijos en pantalla
+            val btnCalc3= findViewById<Button>(R.id.btn3Ventas)
+            btnCalc3.setOnClickListener {
+                val venta1= findViewById<EditText>(R.id.txtInpVenta1).text.toString().toIntOrNull() ?:0
+                val venta2= findViewById<EditText>(R.id.txtInpVenta2).text.toString().toIntOrNull() ?:0
+                val venta3= findViewById<EditText>(R.id.txtInpVenta3).text.toString().toIntOrNull() ?:0
+                val totaVentas= venta1 + venta2 + venta3
+                val netoTotal= sueldoBase + ( totaVentas * bonoPorventa )
+                val txtNeto3Ventas = findViewById<TextView>(R.id.txvRes3ventas)
+                txtNeto3Ventas.text="Sueldo Neto: $${netoTotal.toInt()}"
+            }
+        }
+    }
+    -------------------------
+    | Calc Sueldo Neto [Menu]|
+    |                       |
+    | [txtCantVentas ] [Calc]|
+    |                       |
+    | bono=12% base=300000  |
+    |                       |
+    | CALCULO SOLO 3 VENTAS |
+    |  [txtInpVenta1]       |
+    |  [txtInpVenta2]       |
+    |  [txtInpVenta3]       |
+    |                       |
+    |   [Calculo 3 ventas]  |
+    |                       |
+    |  [txvRes3ventas]      |
+    -------------------------
+nombre del archivo:DetalleVentas.kt
+    Descripcion:Pantalla dinamica que genera N cuadros de texto segun la cantidad de ventas solicitada. Suma los montos y presenta un resumen del sueldo neto en un cuadro de dialogo.
+    Enlace a otros archvos:activity_detalle_ventas.xml (layout).
+    codigo completo:
+    package com.example.ejercicio1app
+    import android.os.Bundle
+    import android.text.InputType
+    import android.widget.Button
+    import android.widget.EditText
+    import android.widget.LinearLayout
+    import androidx.activity.enableEdgeToEdge
+    import androidx.appcompat.app.AlertDialog
+    import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.view.ViewCompat
+    import androidx.core.view.WindowInsetsCompat
+    class DetalleVentas : AppCompatActivity() {
+        private val sueldoBase = 300000.0
+        private val bonoPorVenta = 0.12
+        // Lista dinamica para rastrear los campos creados en tiempo de ejecucion
+        private val listaInputs = mutableListOf<EditText>()
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            enableEdgeToEdge()
+            setContentView(R.layout.activity_detalle_ventas)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+            val container = findViewById<LinearLayout>(R.id.containerVentas)
+            val btnCalcular = findViewById<Button>(R.id.btnCalcularFinal)
+            val btnVolver = findViewById<Button>(R.id.btnVolver)
+            btnVolver.setOnClickListener { finish() }
+            // Recibe el dato enviado por la pantalla anterior
+            val cantVentas = intent.getIntExtra("CANTIDAD_VENTAS", 0)
+            // Bucle didactico: Crea elementos visuales programaticamente (programacion de interfaz dinamica)
+            for (i in 1..cantVentas) {
+                val input = EditText(this).apply {
+                    hint = "Monto Venta $i ($)"
+                    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { setMargins(0, 0, 0, 16) }
+                }
+                listaInputs.add(input) // Guardamos la referencia para sumar despues
+                container.addView(input) // Inyectamos el componente al contenedor vertical (LinearLayout)
+            }
+            btnCalcular.setOnClickListener {
+                var totalMontoVentas = 0.0
+                // Iteramos sobre la lista de referencias para obtener los valores
+                for (input in listaInputs) {
+                    val monto = input.text.toString().toDoubleOrNull() ?: 0.0
+                    totalMontoVentas += monto
+                }
+                val totalBono = totalMontoVentas * bonoPorVenta
+                val sueldoNeto = sueldoBase + totalBono
+                // Presentacion de resultados mediante un Dialogo de Alerta
+                AlertDialog.Builder(this)
+                    .setTitle("Resumen Sueldo Neto")
+                    .setMessage("Sueldo Base: $$sueldoBase\n" +
+                                "Ventas Ingresadas ($cantVentas): $$totalMontoVentas\n" +
+                                "Bono (12%): $$totalBono\n" +
+                                "--------------------------------\n" +
+                                "SUELDO NETO: $$sueldoNeto")
+                    .setPositiveButton("Aceptar", null)
+                    .show()
+            }
+        }
+    }
+    -------------------------
+    | Ingreso Montos [Volver]|
+    |                       |
+    |   (Area con Scroll)   |
+    |   [Monto Venta 1  ]   |
+    |   [Monto Venta 2  ]   |
+    |   [Monto Venta N  ]   |
+    |                       |
+    | [Calcular Sueldo Neto]|
+    -------------------------
+nombre del archivo:build.gradle.kts (App)
+    Descripcion:Script de construccion a nivel de aplicacion. Define las dependencias de librerias (Material, ConstraintLayout, etc.), las versiones del SDK y el ID unico de la aplicacion.
+    Enlace a otros archvos:libs.versions.toml.
+    codigo completo:Omitido por ser archivo de sistema, pero incluye dependencias de androidx.appcompat, material, y constraintlayout.
+nombre del archivo:libs.versions.toml
+    Descripcion:Catalogo de versiones centralizado. Permite gestionar las versiones de todas las librerias y plugins del proyecto en un solo lugar.
+    Enlace a otros archvos:build.gradle.kts.
+    codigo completo:Omitido por ser archivo de sistema. Contiene definiciones de agp="9.3.2", coreKtx="1.19.0", appcompat="1.8.0", etc.
+nombre del archivo:settings.gradle.kts
+    Descripcion:Configuracion de la estructura del proyecto. Define los repositorios de donde se descargan las librerias (Google, MavenCentral) e incluye el modulo ':app'.
+    Enlace a otros archvos:Proyecto root.
+    codigo completo:Omitido por ser archivo de sistema.
